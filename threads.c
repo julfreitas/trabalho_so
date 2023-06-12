@@ -6,36 +6,38 @@
 #define NUM_THREADS_ESCRITA 2
 #define TABLE_SIZE 100
 
-int table[TABLE_SIZE];
-pthread_rwlock_t rwlock;
+int table[TABLE_SIZE]; //criando onde os dados são armazenados
+pthread_rwlock_t rwlock; //trava que permite o acesso seguro à tabela por meio de threads leitoras e escritas
 
-void* reader(void* arg) { //acessando table
+//função executada por cada thread leitora
+void* reader(void* arg) { 
     int thread_id = *(int*)arg;
 
     // Realiza leitura da tabela
-    pthread_rwlock_rdlock(&rwlock); //trava de leitura na table para permitir que múltipas threads leiam simultaniamente
+    pthread_rwlock_rdlock(&rwlock); //trava de leitura para permitir que apenas uma thread leitora por vez pode entrar na seção crítica e que múltipas threads leiam simultaniamente a tabela
     printf("Thread leitora %d lendo a tabela\n", thread_id);
     // Lógica de leitura da tabela
     pthread_rwlock_unlock(&rwlock); //trava é liberada
 
-    pthread_exit(NULL);
+    pthread_exit(NULL); //encerrar execução da thread leitora
 }
 
-void* writer(void* arg) { //acessando table
+//função executada por cada thread escritora
+void* writer(void* arg) {
     int thread_id = *(int*)arg;
 
     // Realiza escrita na tabela
-    pthread_rwlock_wrlock(&rwlock); //trava de escrita na table para garantir exclusão mútua
+    pthread_rwlock_wrlock(&rwlock); //trava de escrita para garantir exclusão mútua
     printf("Thread escritora %d escrevendo na tabela\n", thread_id);
     // Lógica de escrita na tabela
     pthread_rwlock_unlock(&rwlock); //trava é liberada
 
-    pthread_exit(NULL);
+    pthread_exit(NULL); //encerrar execução da thread leitora
 }
 
 int main() {
-    pthread_t readers[NUM_THREADS_LEITURA];
-    pthread_t writers[NUM_THREADS_ESCRITA];
+    pthread_t readers[NUM_THREADS_LEITURA]; //identificação das threads leitoras
+    pthread_t writers[NUM_THREADS_ESCRITA]; //identificação das threads escritoras
     int reader_ids[NUM_THREADS_LEITURA];
     int writer_ids[NUM_THREADS_ESCRITA];
 
